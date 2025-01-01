@@ -1,7 +1,10 @@
 # Unity Runway
 Take off with ease! Manage all your Unity versions, projects, and workflows seamlessly in one place. 
 
+Download the latest version from [Release](https://github.com/sorcerb/unity-runway/releases)
+
 ![Unity Runway](https://github.com/sorcerb/unity-runway/blob/master/preview.png)
+
 
 ## Planned Improvements 🚀
 - [x]  Thumb preview
@@ -18,4 +21,4 @@ Take off with ease! Manage all your Unity versions, projects, and workflows seam
 
 Before making any changes, please ensure you create a backup of your project. Use this program at your own risk. The author is not responsible for any data loss, damages, or other issues resulting from its use.
 
-This project is open-source and licensed under the MIT License. You are free to use, modify, and distribute it, but commercial use is prohibited. If you want to use this project for commercial purposes, please contact the author for permission.
+This project is open-source and licensed under the MIT License. You are free to use, modify, and distribute it.
