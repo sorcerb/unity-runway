@@ -1,7 +1,7 @@
 {
   "name": "unity-runway",
   "productName": "unity-runway",
-  "version": "0.0.1-alpha",
+  "version": "0.0.2-alpha",
   "description": "Unity runway - Yet Another hub",
   "main": ".vite/build/main.js",
   "scripts": {
