@@ -1,3 +1,4 @@
+import { EditorModel } from "./EditorFolderModel";
 
 export interface ProjectModel {
     id: string;
@@ -8,4 +9,5 @@ export interface ProjectModel {
     modified: Date | null;
     modifiedText: string;
     editorVersion: string;
+    selectedEditor: EditorModel | null;
 }

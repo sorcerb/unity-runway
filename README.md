@@ -11,7 +11,7 @@ Download the latest version from [Release](https://github.com/sorcerb/unity-runw
 - [x]  Tags
 - [x]  Project rename
 - [ ]  Thumb load
-- [ ]  Select editor version
+- [x]  Select editor version
 - [ ]  New project template selection
 - [ ]  Editor and features install
 

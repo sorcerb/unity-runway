@@ -14,7 +14,7 @@ const api = {
   updateProject: (path: string, updatedObj: Partial<ProjectModel>): Promise<void> => ipcRenderer.invoke('update-project', path, updatedObj),
   removeProject: (path: string): Promise<void> => ipcRenderer.invoke('remove-project', path),
   renameProject: (path: string, newName: string): Promise<void> => ipcRenderer.invoke('rename', path, newName),
-  lunchProject: (editorPath: string, projectPath: string): Promise<void> => ipcRenderer.invoke('launch-project', editorPath, projectPath),
+  launchProject: (editorPath: string, projectPath: string): Promise<void> => ipcRenderer.invoke('launch-project', editorPath, projectPath),
 
   getEditorFolders: (): Promise<EditorFolderModel[]> => ipcRenderer.invoke('get-editor-folders'),
   addEditorFolder: (newObj: EditorFolderModel): Promise<void> => ipcRenderer.invoke('add-editor-folder', newObj),

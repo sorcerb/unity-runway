@@ -143,10 +143,10 @@ const Projects = () => {
     };
 
     const openProject = async (model: ProjectModel) => {
-        const editorPath = editors.find(s => s.version === model.editorVersion);
+        const editorPath = model.selectedEditor ?? editors.find(s => s.version === model.editorVersion);
         if (editorPath) {
             const editorExe = editorPath.path + '\\' + editorPath.version + '\\Editor\\Unity.exe';
-            await window.electron.lunchProject(editorExe, model.path);
+            await window.electron.launchProject(editorExe, model.path);
         }
     }
 
@@ -158,7 +158,7 @@ const Projects = () => {
         handleTagsOpen,
         handleRemoveProject
     )
-    
+
     return (
         <>
             <div className="h-12 mb-4 flex items-center justify-between">
@@ -228,6 +228,13 @@ const Projects = () => {
                         },
                         [`& .${gridClasses.columnHeader}: focus - within, & .${gridClasses.cell}: focus - within`]: {
                             outline: 'none',
+                        },
+                        "& .MuiDataGrid-cell:focus-within, & .MuiDataGrid-cell:focus": {
+                            outline: "none !important",
+                        },
+                        "& .MuiDataGrid-columnHeader:focus-within, & .MuiDataGrid-columnHeader:focus":
+                        {
+                            outline: "none !important",
                         },
                     }}
                 />

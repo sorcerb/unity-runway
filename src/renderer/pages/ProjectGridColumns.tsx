@@ -1,8 +1,9 @@
 import { GridColDef, GridActionsCellItem, GridCellParams, GridRowParams, GridSortCellParams } from "@mui/x-data-grid";
-import { ExclamationTriangleIcon, PlayIcon } from "@heroicons/react/24/outline";
-import { Chip } from "@mui/material";
+import { ChevronUpDownIcon, ExclamationTriangleIcon, PlayIcon } from "@heroicons/react/24/outline";
+import { Box, Chip, FormControl, IconButton, MenuItem, Select, SelectChangeEvent } from "@mui/material";
 import { ProjectModel } from "../models/ProjectModel";
 import { EditorModel } from "../models/EditorFolderModel";
+import React, { useEffect } from "react";
 
 export const getColumns = (
     editors: EditorModel[],
@@ -11,23 +12,9 @@ export const getColumns = (
     handleRenameOpen: (model: ProjectModel) => void,
     handleTagsOpen: (model: ProjectModel) => void,
     handleRemoveProject: (path: string) => Promise<void>
-): GridColDef[] => [
-        {
-            field: 'lunch', type: 'actions', headerName: '', width: 50, sortable: false, resizable: false,
-            getActions: (params: GridRowParams<ProjectModel>) => {
-                const showLunch = editors.some((s) => s.version === params.row.editorVersion);
+): GridColDef[] => {
 
-                return showLunch
-                    ? [
-                        <GridActionsCellItem
-                            icon={<PlayIcon className="w-6 text-green-300" />}
-                            label="Lunch project"
-                            onClick={() => openProject(params.row)}
-                        />,
-                    ]
-                    : [];
-            },
-        },
+    return [
         {
             field: "preview", headerName: "", sortable: false, width: 120, resizable: false,
             renderCell: (params: GridCellParams) => {
@@ -57,8 +44,7 @@ export const getColumns = (
                             key={index}
                             label={tag}
                             variant="outlined"
-                            size="small"
-                        />
+                            size="small" />
                     ))}
                 </>;
             }
@@ -72,15 +58,82 @@ export const getColumns = (
             }, width: 120
         },
         {
-            field: 'editor', headerName: 'Editor', width: 130,
+            field: 'editor', headerName: 'Editor', width: 120,
             renderCell: (params: GridCellParams) => {
+
+                const [editor, setEditor] = React.useState('');
+
+                const handleChange = (event: SelectChangeEvent) => {
+                    setEditor(event.target.value as string);
+                    if (editors.some(s => s.version === event.target.value)) {
+                        const matchingEditor = editors.find(s => s.version === event.target.value);
+                        params.row.selectedEditor = matchingEditor ?? null;
+                    } else {
+                        params.row.selectedEditor = null;
+                    }
+                    params.api.updateRows([params.row]);
+                };
+
+                useEffect(() => {
+                    if (editors.some(s => s.version === params.row.editorVersion)) {
+                        const matchingEditor = editors.find(s => s.version === params.row.editorVersion);
+                        setEditor(matchingEditor?.version || '');
+                    } else {
+                        setEditor(params.row.editorVersion);
+                    }
+
+                }, []);
+
                 return <>
                     <div className="font-bold text-neutral-200">
-                        {!editors.some(s => s.version === params.row.editorVersion) && <ExclamationTriangleIcon className="w-5 me-1 inline text-orange-500" />}
-                        {params.row.editorVersion}
+                        <FormControl size="small" variant="standard">
+                            <Select
+                                id={`editor-version-${params.row.version}`}
+                                value={editor}
+                                onChange={handleChange}
+                            >
+                                {!editors.some((s) => s.version === params.row.editorVersion) && (
+                                    <MenuItem value={params.row.editorVersion}>{params.row.editorVersion}</MenuItem>
+                                )}
+                                {editors.map((editor) => (
+                                    <MenuItem key={editor.version} value={editor.version}>
+                                        {editor.version}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
                     </div>
                 </>;
             }
+        },
+        {
+            field: 'launch', type: 'actions', headerName: '', width: 50, sortable: false, resizable: false,
+            getActions: (params: GridRowParams<ProjectModel>) => {
+                const [showLaunch, setShowLaunch] = React.useState(false);
+
+                React.useEffect(() => {
+                    let editorExists = false;
+                    if (params.row.selectedEditor != null) {
+                        editorExists = editors.some((s) => s.version === params.row.selectedEditor?.version);
+                    } else {
+                        editorExists = editors.some((s) => s.version === params.row.editorVersion);
+                    }
+                    setShowLaunch(editorExists);
+                }, [params.row.selectedEditor]);
+
+                return showLaunch
+                    ? [
+                        <GridActionsCellItem
+                            icon={<PlayIcon className="w-6 text-green-300" />}
+                            label="Launch project"
+                            onClick={() => openProject(params.row)} />,
+                    ]
+                    : [
+                        <IconButton>
+                            <ExclamationTriangleIcon className="w-5 text-orange-500" />
+                        </IconButton>
+                    ];
+            },
         },
         {
             field: 'actions', type: 'actions', headerName: '', width: 50, sortable: false, resizable: false, align: 'center',
@@ -88,24 +141,21 @@ export const getColumns = (
                 <GridActionsCellItem
                     label="Show in Explorer"
                     onClick={() => handleShowFolderInExplorer(params.row.path)}
-                    showInMenu
-                />,
+                    showInMenu />,
                 <GridActionsCellItem
                     label="Rename"
                     onClick={() => handleRenameOpen(params.row)}
-                    showInMenu
-                />,
+                    showInMenu />,
                 <GridActionsCellItem
                     label="Edit tags"
                     onClick={() => handleTagsOpen(params.row)}
-                    showInMenu
-                />,
+                    showInMenu />,
                 <GridActionsCellItem
                     className="!text-red-200 hover:!bg-red-700"
                     label="Remove Project"
                     onClick={() => handleRemoveProject(params.row.path)}
-                    showInMenu
-                />,
+                    showInMenu />,
             ],
         },
     ];
+};
