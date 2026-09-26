@@ -6,7 +6,7 @@ import { EditorFolderModel, EditorModel } from '../renderer/models/EditorFolderM
 import { mainWindow } from './main';
 import { formatDistanceToNow } from 'date-fns';
 import path, { join } from 'path';
-import { exec } from 'child_process';
+import { spawn } from 'child_process';
 
 ipcMain.handle('dialog:select-folder', async () => {
     const result = await dialog.showOpenDialog(mainWindow, {
@@ -133,20 +133,22 @@ ipcMain.handle('launch-project', async (_event, editorPath: string, projectPath:
             throw new Error('Both folderPath and unityEditorPath must be provided.');
         }
 
-        const command = `"${editorPath}" -projectPath "${projectPath}"`;
-
-        exec(command, (error, stdout, stderr) => {
-            if (error) {
-                console.error('Error launching Unity project:', error);
-                throw error;
-            }
-
-            if (stderr) {
-                console.warn('Unity stderr:', stderr);
-            }
-
-            console.log('Unity stdout:', stdout);
+        // Spawn Unity directly (no cmd.exe shell) and fully detached: without a shared console
+        // a stray Ctrl+C / console close can't kill the editor, its import workers and ParrelSync clones,
+        // and the editor's exit code no longer matters to the launcher.
+        const child = spawn(editorPath, ['-projectPath', projectPath], {
+            cwd: path.dirname(editorPath),
+            detached: true,
+            stdio: 'ignore',
+            windowsHide: false,
         });
+
+        await new Promise<void>((resolve, reject) => {
+            child.once('spawn', resolve);
+            child.once('error', reject);
+        });
+
+        child.unref();
 
         return { success: true, message: `Unity project at ${projectPath} is launching...` };
     } catch (error) {
