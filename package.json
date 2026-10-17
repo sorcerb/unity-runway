@@ -1,7 +1,7 @@
 {
   "name": "unity-runway",
   "productName": "unity-runway",
-  "version": "1.0.15",
+  "version": "1.0.16",
   "description": "Unity runway - Yet Another hub",
   "main": "out/main/main.js",
   "scripts": {
