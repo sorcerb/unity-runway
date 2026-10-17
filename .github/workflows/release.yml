@@ -1,0 +1,43 @@
+# Pushing a version tag (npm run release) builds the installer and publishes it as a GitHub release
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: yarn
+
+      - name: Check that the tag matches package.json
+        shell: bash
+        run: test "v$(node -p "require('./package.json').version")" = "$GITHUB_REF_NAME"
+
+      - run: yarn install --frozen-lockfile
+
+      - run: npm run typecheck
+
+      - name: Build the installer
+        run: npx electron-vite build && npx electron-builder --win --publish never
+        env:
+          # No code signing certificate
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          # latest.yml and the blockmap are for auto update (electron-updater)
+          files: |
+            release/*.exe
+            release/*.exe.blockmap
+            release/latest.yml
+          generate_release_notes: true

@@ -1,0 +1,35 @@
+appId: com.sorcer.unity-runway
+# productName comes from package.json: it also names the userData folder (%APPDATA%\unity-runway) with the saved projects
+directories:
+  output: release
+  buildResources: src/assets
+files:
+  - out/**/*
+  # All dependencies are bundled by electron-vite
+  - '!node_modules/**/*'
+asar: true
+npmRebuild: false
+electronFuses:
+  runAsNode: false
+  enableCookieEncryption: true
+  enableNodeOptionsEnvironmentVariable: false
+  enableNodeCliInspectArguments: false
+  enableEmbeddedAsarIntegrityValidation: true
+  onlyLoadAppFromAsar: true
+win:
+  target: nsis
+  # Rendered from icon.svg by scripts/icon.cjs
+  icon: src/assets/icon.png
+nsis:
+  oneClick: true
+  perMachine: false
+  createDesktopShortcut: always
+  createStartMenuShortcut: true
+  shortcutName: Unity Runway
+  uninstallDisplayName: Unity Runway
+  artifactName: UnityRunway-Setup-${version}.${ext}
+# Where electron-updater looks for latest.yml (main/updater.ts); the release workflow uploads it
+publish:
+  provider: github
+  owner: sorcerb
+  repo: unity-runway

@@ -1,0 +1,56 @@
+{
+  "name": "unity-runway",
+  "productName": "unity-runway",
+  "version": "1.0.15",
+  "description": "Unity runway - Yet Another hub",
+  "main": "out/main/main.js",
+  "scripts": {
+    "dev": "electron-vite dev -w",
+    "build": "electron-vite build",
+    "preview": "electron-vite preview",
+    "typecheck": "tsc --noEmit",
+    "package": "electron-vite build && electron-builder --win --dir",
+    "make": "electron-vite build && electron-builder --win",
+    "release": "node scripts/release.mjs",
+    "lint": "eslint --ext .ts,.tsx ."
+  },
+  "devDependencies": {
+    "@types/node": "^24.6.2",
+    "@types/react": "^19.0.2",
+    "@types/react-dom": "^19.0.2",
+    "@typescript-eslint/eslint-plugin": "^5.0.0",
+    "@typescript-eslint/parser": "^5.0.0",
+    "autoprefixer": "^10.4.20",
+    "electron": "33.2.1",
+    "electron-builder": "^26.15.3",
+    "electron-vite": "^5.0.0",
+    "eslint": "^8.0.1",
+    "eslint-plugin-import": "^2.25.0",
+    "tailwindcss": "^3.4.17",
+    "typescript": "~5.9.3",
+    "vite": "^5.0.12"
+  },
+  "keywords": [],
+  "author": {
+    "name": "Sorcer",
+    "email": "sorcer.boo@gmail.com"
+  },
+  "license": "GPL-3.0-or-later",
+  "repository": "github:sorcerb/unity-runway",
+  "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@fontsource/open-sans": "^5.1.0",
+    "@heroicons/react": "^2.2.0",
+    "@mui/material": "^6.3.0",
+    "@mui/x-data-grid": "^7.23.5",
+    "date-fns": "^4.1.0",
+    "electron-store": "8.2.0",
+    "electron-updater": "^6.8.9",
+    "postcss": "^8.4.49",
+    "postcss-loader": "^8.1.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-router-dom": "^7.1.1"
+  }
+}
