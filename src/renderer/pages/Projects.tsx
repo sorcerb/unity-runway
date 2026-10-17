@@ -4,6 +4,7 @@ import { GridColDef, DataGrid, GridSortItem, gridClasses } from "@mui/x-data-gri
 import RenameModal from "../components/RenameModal";
 import TagsModal from "../components/TagsModal";
 import NewProjectModal from "../components/NewProjectModal";
+import { toPreviewPng } from "../utils/image";
 import { Box, InputAdornment, TextField } from "@mui/material";
 import { MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { EditorModel } from "../models/EditorFolderModel";
@@ -151,6 +152,18 @@ const Projects = () => {
         loadData();
     };
 
+    const handleSetPreview = async (model: ProjectModel) => {
+        try {
+            const image = await window.electron.pickProjectPreview(model.path);
+            if (image) {
+                await window.electron.saveProjectPreview(model.path, await toPreviewPng(image));
+                loadData();
+            }
+        } catch (e) {
+            alert(`Preview not saved: ${(e as Error).message.replace(/^Error invoking remote method '[^']+': (Error: )?/, '')}`);
+        }
+    };
+
     const openProject = async (model: ProjectModel) => {
         const editor = model.selectedEditor ?? editors.find(s => s.version === model.editorVersion);
         if (editor) {
@@ -175,7 +188,8 @@ const Projects = () => {
         handleShowFolderInExplorer,
         handleRenameOpen,
         handleTagsOpen,
-        handleRemoveProject
+        handleRemoveProject,
+        handleSetPreview
     )
 
     return (

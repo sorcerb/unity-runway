@@ -26,7 +26,7 @@ Download the installer (`UnityRunway-Setup-<version>.exe`) from the [Releases](.
 1. In **Settings**, add the folders with your Unity editors (for example `C:\Program Files\Unity\Hub\Editor`), or press **Import from Hub**.
 2. In **Projects**, press **Add** to add existing projects or **New** to create one.
 
-To show a preview of a project in the list, put a `preview.png` or `preview.jpg` into the project folder.
+To set a project's preview, choose **Change preview** in its menu and pick an image (PNG, JPG, WebP, GIF, BMP or AVIF); it is saved as `preview.png` in the project folder. A `preview.png` or `preview.jpg` put there by hand works too.
 
 Make a backup or commit your project to version control before renaming it or opening it with another Unity version. Use the program at your own risk.
 

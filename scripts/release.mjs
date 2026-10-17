@@ -1,4 +1,4 @@
-// Publishes the current tree to GitHub as one commit on master, so the local history (the dev branch) stays private,
+// Publishes the current tree to GitHub as one commit on main, so the local history (the dev branch) stays private,
 // and pushes the version tag on it: GitHub Actions builds the installer and publishes the release.
 // Bumps the patch version first (a local commit and tag); `-- minor` / `-- major` bump the other parts,
 // `-- --no-bump` publishes the current version.
@@ -6,7 +6,7 @@ import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 
 const REMOTE = 'origin';
-const BRANCH = 'master';
+const BRANCH = 'main';
 const git = (...args) => execFileSync('git', args, { encoding: 'utf8' }).trim();
 
 if (git('status', '--porcelain')) throw new Error('Commit or stash the changes first');

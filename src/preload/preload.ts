@@ -16,6 +16,9 @@ const api = {
   updateProject: (path: string, updatedObj: Partial<ProjectModel>): Promise<void> => ipcRenderer.invoke('update-project', path, updatedObj),
   removeProject: (path: string): Promise<void> => ipcRenderer.invoke('remove-project', path),
   renameProject: (path: string, newName: string): Promise<Result> => ipcRenderer.invoke('rename', path, newName),
+  // A data: URL of the picked image, or null when cancelled.
+  pickProjectPreview: (path: string): Promise<string | null> => ipcRenderer.invoke('project:pick-preview', path),
+  saveProjectPreview: (path: string, png: Uint8Array): Promise<void> => ipcRenderer.invoke('project:save-preview', path, png),
   launchProject: (editor: EditorModel, projectPath: string): Promise<Result> => ipcRenderer.invoke('launch-project', editor, projectPath),
   createProject: (request: NewProjectRequest): Promise<Result> => ipcRenderer.invoke('create-project', request),
   getProjectTemplates: (editor: EditorModel): Promise<ProjectTemplateModel[]> => ipcRenderer.invoke('editors:templates', editor),

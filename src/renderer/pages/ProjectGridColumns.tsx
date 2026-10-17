@@ -11,7 +11,8 @@ export const getColumns = (
     handleShowFolderInExplorer: (path: string) => Promise<void>,
     handleRenameOpen: (model: ProjectModel) => void,
     handleTagsOpen: (model: ProjectModel) => void,
-    handleRemoveProject: (path: string) => Promise<void>
+    handleRemoveProject: (path: string) => Promise<void>,
+    handleSetPreview: (model: ProjectModel) => Promise<void>
 ): GridColDef[] => {
 
     return [
@@ -127,6 +128,10 @@ export const getColumns = (
                 <GridActionsCellItem
                     label="Edit tags"
                     onClick={() => handleTagsOpen(params.row)}
+                    showInMenu />,
+                <GridActionsCellItem
+                    label={params.row.preview ? 'Change preview' : 'Set preview'}
+                    onClick={() => handleSetPreview(params.row)}
                     showInMenu />,
                 <GridActionsCellItem
                     className="!text-red-200 hover:!bg-red-700"

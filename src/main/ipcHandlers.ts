@@ -1,5 +1,5 @@
 import { dialog, ipcMain, shell } from 'electron';
-import { closeSync, existsSync, openSync, readdirSync, readFileSync, renameSync, statSync } from 'fs';
+import { closeSync, existsSync, openSync, readdirSync, readFileSync, renameSync, rmSync, statSync, writeFileSync } from 'fs';
 import { compareVersions, findInstalledEditor, GetEditorVersions, getProjectTemplates, spawnEditor } from './editors';
 import { addEditorFolder, addProject, getEditorFolders, getProjects, removeEditorFolder, removeProject, renameProject, updateProject } from '../renderer/stores/projectStore';
 import { ProjectModel } from '../renderer/models/ProjectModel';
@@ -25,7 +25,8 @@ ipcMain.handle('get-projects', () => {
     const projects = getProjects();
     projects.forEach(project => {
         const preview = GetPreview(project.path);
-        project.preview = preview ? toPreviewUrl(preview) : null;
+        // The modification time busts the renderer's image cache when the preview is replaced.
+        project.preview = preview ? `${toPreviewUrl(preview)}&t=${statSync(preview).mtimeMs}` : null;
         project.id = project.path;
         // Prefer the time the launcher last opened the project; fall back to the folder mtime for projects never opened from here.
         const m = project.lastOpened ? FormatModified(new Date(project.lastOpened)) : GetModified(project.path);
@@ -50,6 +51,47 @@ const GetPreview = (folderPath: string) => {
         }
     }
 }
+
+// Preview images: the renderer decodes the picked file (Chromium reads far more formats than nativeImage),
+// scales it down and hands back a PNG, saved as the project's preview.png.
+const PREVIEW_IMAGE_TYPES: Record<string, string> = {
+    png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', jfif: 'image/jpeg', webp: 'image/webp',
+    gif: 'image/gif', bmp: 'image/bmp', avif: 'image/avif',
+};
+const PNG_SIGNATURE = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+
+const isKnownProject = (projectPath: string) => getProjects().some(p => p.path === projectPath);
+
+ipcMain.handle('project:pick-preview', async (_event, projectPath: string) => {
+    if (!isKnownProject(projectPath)) {
+        throw new Error('Unknown project.');
+    }
+    const result = await dialog.showOpenDialog(mainWindow, {
+        title: 'Select a preview image...',
+        buttonLabel: 'Set Preview',
+        properties: ['openFile'],
+        filters: [{ name: 'Images', extensions: Object.keys(PREVIEW_IMAGE_TYPES) }],
+    });
+    const file = result.filePaths[0];
+    if (!file) {
+        return null;
+    }
+    const type = PREVIEW_IMAGE_TYPES[path.extname(file).slice(1).toLowerCase()];
+    if (!type) {
+        throw new Error('Unsupported image format.');
+    }
+    return `data:${type};base64,${readFileSync(file).toString('base64')}`;
+});
+
+ipcMain.handle('project:save-preview', (_event, projectPath: string, png: Uint8Array) => {
+    const data = Buffer.from(png);
+    if (!isKnownProject(projectPath) || !data.subarray(0, 8).equals(PNG_SIGNATURE)) {
+        throw new Error('Invalid preview.');
+    }
+    writeFileSync(path.join(projectPath, 'preview.png'), data);
+    // preview.png wins over preview.jpg anyway; drop the old one so the folder has a single preview.
+    rmSync(path.join(projectPath, 'preview.jpg'), { force: true });
+});
 
 const GetModified = (folderPath: string) => {
     try {
